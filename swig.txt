@@ -1,0 +1,125 @@
+import RestaurantCard from './RestaurantCard';
+import { useEffect, useState } from 'react';
+import resList from '../utils/mockData';
+
+const Body = () => {
+    const [listOfRestaurants,setListOfRestaurants] = useState(resList);
+    
+    useEffect(()=>{
+      fetchData();
+    },[]);
+
+    const fetchData = async () => {
+      const data =  await fetch(
+        "https://www.swiggy.com/dapi/restaurants/list/v5?lat=12.96340&lng=77.58550&is-seo-homepage-enabled=true&page_type=DESKTOP_WEB_LISTING"      );
+      const json = await data.json();
+
+      console.log(json);
+     };
+
+    return (
+      <div className="body">
+        <button
+          className="filter-btn"
+          onClick = {() => {
+            const filterRestaurants = listOfRestaurants.filter(
+                (res)=> res.info.avgRating > 4
+            );
+            setListOfRestaurants(filterRestaurants);
+          }
+        }
+        >
+          Top rated restaurant
+        </button>
+        <div className="res-container">
+          {listOfRestaurants.map((restaurant) => (
+            <RestaurantCard key={restaurant.info.id} resData={restaurant} />
+          ))}
+        </div>
+      </div>
+    );
+  };
+  export default Body;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import RestaurantCard from './RestaurantCard';
+import { useEffect, useState } from 'react';
+import resList from '../utils/mockData';
+
+const Body = () => {
+  const [listOfRestaurants, setListOfRestaurants] = useState(resList);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch(
+        "/api?lat=12.96340&lng=77.58550&is-seo-homepage-enabled=true&page_type=DESKTOP_WEB_LISTING"
+      );
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const text = await response.text();
+      console.log("Raw response:", text);
+      const json = JSON.parse(text);
+      console.log("Parsed JSON:", json);
+
+      // Update listOfRestaurants with fetched data
+      setListOfRestaurants(json?.data?.cards || []);
+    } catch (error) {
+      console.error("Fetch error:", error);
+    }
+  };
+
+  return (
+    <div className="body">
+      <button
+        className="filter-btn"
+        onClick={() => {
+          const filterRestaurants = listOfRestaurants.filter(
+            (res) => res.info.avgRating > 4
+          );
+          setListOfRestaurants(filterRestaurants);
+        }}
+      >
+        Top rated restaurant
+      </button>
+      <div className="res-container">
+        {listOfRestaurants.map((restaurant) => (
+          <RestaurantCard key={restaurant.info.id} resData={restaurant} />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default Body;
+
+
+
+
+
+
+
+
+
+
+
+
